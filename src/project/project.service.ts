@@ -21,6 +21,7 @@ export class ProjectService {
       user: { id },      
     }
 
+    
     console.log(createProjectDto)
 
     if(!newProject) 
@@ -44,3 +45,4 @@ export class ProjectService {
     return `This action removes a #${id} project`;
   }
 }
+

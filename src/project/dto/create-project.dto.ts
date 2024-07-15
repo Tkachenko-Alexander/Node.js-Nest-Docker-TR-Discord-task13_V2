@@ -4,18 +4,19 @@ import { User } from "src/user/entities/user.entity"
 
 export class CreateProjectDto {
     @IsNotEmpty()
-    title: string
+    title: string;
 
     @IsNotEmpty()
     @IsNumber()
-    amount: number
+    amount: number;
 
     @IsString()
     @MinLength(6)
     type: 'expense' | 'income'
 
     @IsNotEmpty()
-    task: Task
+    task: Task;
+
     @IsNotEmpty()
-    user: User
+    user: User;
 }
