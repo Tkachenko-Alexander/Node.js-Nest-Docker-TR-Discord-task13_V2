@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,27 +22,77 @@ export class ProjectService {
     }
 
     
-    console.log(createProjectDto)
 
     if(!newProject) 
       throw new BadRequestException('Something went wrong...')
     return await this.projectRepository.save(newProject);
   }
 
-  findAll() {
-    return `This action returns all project`;
+  async findAll(id: number) {
+    const projects = await this.projectRepository.find({
+      where: {
+        user: { id },
+      },
+      order: {
+        createdAt: 'DESC',
+      }
+    })
+    return projects;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+ 
+  async findOne(id: number) {
+    const project =  await this.projectRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        user: true,
+        task: true,
+      }
+    })
+    if(!project) throw new NotFoundException('Project not found')
+    return Project;
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
+    const project = await this.projectRepository.findOne({
+      where: { id },
+    })
+
+    if(!project) throw new NotFoundException('Project not Found')
+
+
+    return await this.projectRepository.update(id, updateProjectDto)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async remove(id: number) {
+    const project = await this.projectRepository.findOne({
+      where: { id },
+    })
+
+    if(!project) throw new NotFoundException('Project not Found')
+
+    return await this.projectRepository.delete(id)
+  }
+
+  async findAllWithPagination(id: number, page: number, limit: number) {
+    const projects = await this.projectRepository.find({
+      where: {
+        user: { id }
+      },
+      relations: {
+        task: true,
+        user: true,
+      },
+      order: {
+        createdAt: "DESC"
+      },
+      take: limit,
+      skip: (page -1) * limit,
+    })
+
+    return projects
   }
 }
 
